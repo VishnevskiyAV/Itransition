@@ -57,7 +57,7 @@ docker exec -it <cintauner_id> bash
 ##  Работа с Docker Compose
 ```
 docker-compose up -d
-docker-compose -f .\docker-compose.yml
+docker-compose -f .\docker-compose.yml up -d
 
 ```
 <img src="./images/wordpress-site.png"><br>
