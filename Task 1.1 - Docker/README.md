@@ -53,10 +53,11 @@ docker exec -it <cintauner_id> bash
 
 ```
 <img src="./images/Ruby-version.png"><br>
+
+##  Работа с Docker Compose
 ```
 docker-compose up -d
-docker-compose -f .\docekr-compose.yml
+docker-compose -f .\docker-compose.yml
 
 ```
-##  Работа с Docker Compose
 <img src="./images/wordpress-site.png"><br>
