@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  namespace: test
+  labels:
+    app: web-app
+    project: simple-app
+    env: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      project: simple-app
+  template:
+    metadata:
+      labels:
+        project: simple-app
+    spec:
+      containers:
+        - name: web-app
+          image: simple-web-app:version3
+          imagePullPolicy: Never
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "256m"
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-entrypoint
+  namespace: test
+spec:
+  type: NodePort
+  selector:
+    project: simple-app
+  ports:
+  - port: 8000
+    nodePort: 30001
