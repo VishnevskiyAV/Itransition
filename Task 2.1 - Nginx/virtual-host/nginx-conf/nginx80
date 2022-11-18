@@ -1,0 +1,71 @@
+
+server {
+        listen 80;
+        server_name _;
+        server_tokens off;
+
+        access_log /var/log/nginx/nginx_revers_proxy_access.log;
+        error_log /var/log/nginx/nginx_revers_proxy_error.log;
+
+        # настройка буфера для прокси сервера
+        proxy_buffering on;
+       # proxy_buffer_size 8k;
+       # proxy_buffers 8 8k;
+
+        set $skip_cache 0;
+
+        # Urls without a utm_source should always go to PHP
+        if ($arg_utm_source = "") {
+            set $skip_cache 1;
+
+
+        # Don't cache urls containing the following segments
+        if ($request_uri ~* "/wp-admin/|/xmlrpc.php|wp-.*.php|^/feed/*|/tag/.*/feed/*|index.php|/.*sitemap.*\.(xml|xsl)") {
+            set $skip_cache 1;
+        }
+
+        location / {
+                proxy_pass              http://127.0.0.1:8080/;
+                proxy_set_header        Host                    $host;
+                proxy_set_header        X-Real-IP               $remote_addr;
+                proxy_set_header        X-Forwarded-For         $proxy_add_x_forwarded_for;
+                proxy_cache  my-cache;
+                proxy_cache_valid  200 302  60m;
+                proxy_cache_valid  404      1m;
+                proxy_cache_revalidate on;
+                proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+                proxy_cache_background_update on;
+                proxy_cache_lock on;
+               # proxy_cache_bypass $arg_utm_campaign;
+                add_header X-Cache $upstream_cache_status;
+                proxy_cache_bypass $skip_cache;
+                proxy_no_cache $skip_cache;
+        }
+}
+
+log_format main 'User_IP_address = $http_x_forwarded_for - Server_hostname = $hostname  $remote_user [$time_local] "$request" '
+'$status $body_bytes_sent "$http_referer" '
+'"$http_user_agent" $request_time';
+
+server {
+        listen   8080;
+        server_name back;
+        root /var/www/wordpress/;
+
+        access_log /var/log/nginx/back_server_access.log main;
+        error_log /var/log/nginx/back_server__error.log;
+
+        index index.php index.html index.htm;
+        server_tokens off;
+        location ~ \.php$ {
+                try_files $uri /index.php;
+                fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include /etc/nginx/fastcgi_params;
+        }
+        location ~ /\.ht {
+                deny all;
+        }
+}
+
