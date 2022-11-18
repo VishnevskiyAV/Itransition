@@ -4,6 +4,7 @@
 # Installed automaticaly mysql nginx php-fpm (dir: virtual-host\user-data.sh)
 
 ```
+<img src="./images/first_task.png"><br>
 
 ## Изменение конфигурации nginx
 ```
@@ -19,14 +20,17 @@ sudo systemctl restart nginx
 # To avoid memory problems
 sudo nano /etc/nginx/nginx.conf
 activate server_names_hash_bucket_size 64;
+```
+<img src="./images/nginx_on_both_ports.png"><br>
 
+```
 # Configure nginx:80 to reverse proxy
 Use config file (dir: nginx-conf/nginx80)
 
 # Configure logging on backend server
 Use config file (dir: nginx-conf/nginx80)
 
-```
+
 
 ## Installing Wordpress
 ```
