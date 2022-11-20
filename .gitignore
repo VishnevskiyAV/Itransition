@@ -1,6 +1,7 @@
 .env
 .vscode/
 .terraform/
+ssh/
 *.tfstate
 *.tfstate.backup
 *.terraform.lock.hcl

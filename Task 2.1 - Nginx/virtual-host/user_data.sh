@@ -9,8 +9,11 @@ apt-get -y install php-mysql
 apt-get -y install net-tools
 
 echo "12 2 * * * root find /tmp -depth -mtime +14 -size +5 -exec rm -rf {} \;" >> /etc/crontab
+mkdir -p /var/www/cache
+
+
 echo PubkeyAcceptedKeyTypes +ssh-rsa >>/etc/ssh/sshd_config
-systemctl start sshd
+sudo systemctl restart sshd
 systemctl enable nginx
 systemctl start nginx
 systemctl enable mysql

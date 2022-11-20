@@ -1,6 +1,6 @@
 # Terraform
 #
-# Create simple server with nginx, mysql & wordpress  
+# Create simple server with nginx & mysql 
 #
 # Made by Aleksandr Vishnevskiy
 

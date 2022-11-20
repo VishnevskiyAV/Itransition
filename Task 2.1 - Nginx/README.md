@@ -1,3 +1,13 @@
+## Full automated version of deployment the task
+[Auto_Expand](https://github.com/VishnevskiyAV/Itransition/tree/main/Task%202.1%20-%20Nginx/Auto_Expand)
+
+```
+terraform init
+terraform apply
+# Task will be done automatically
+
+```
+
 ## Создать виртуальную машину, установить nginx, php-fpm, mysql
 ```
 # Creaeted a virtual machine in AWS with terraform file (dir: virtual-host\main.tf)
@@ -30,7 +40,7 @@ Use config file (dir: nginx-conf/nginx80)
 # Configure logging on backend server
 Use config file (dir: nginx-conf/nginx80)
 
-
+```
 
 ## Installing Wordpress
 ```
@@ -88,3 +98,4 @@ sudo nginx -s reload
 
 <img src="./images/with_versions.png"><br>
 <img src="./images/without_versions.png"><br>
+
