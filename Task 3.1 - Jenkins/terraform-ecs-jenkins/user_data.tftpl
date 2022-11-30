@@ -1,0 +1,14 @@
+#!/bin/bash
+# Installing packages
+yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+yum install -y https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+yum install -y nano
+yum install -y collectd
+# Connecting to ECS Cluster
+mkdir -p /etc/ecs/
+echo ECS_CLUSTER=${ecs_cluster} >>/etc/ecs/ecs.config
+# Mount EFS volumes
+mkdir -p /home/ec2-user/Jenkins
+echo -e "${EFSJenkinsVolume}:/ /home/ec2-user/Jenkins efs tls,_netdev 0 0" >>/etc/fstab
+mount -a
+sudo chown 1000:497 /var/run/docker.sock
