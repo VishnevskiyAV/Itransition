@@ -1,7 +1,7 @@
 [
   {
     "name": "jenkins",
-    "image": "vishnevskiyav/myjenkins-blueocean:2.361.4-2",
+    "image": "vishnevskiyav/myjenkins-blueocean:2.361.4-3",
     "cpu": 1024,
     "memory": 2048,
     "essential": true,
