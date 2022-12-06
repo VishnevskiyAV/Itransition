@@ -8,3 +8,4 @@ ssh/
 *.tfstate.lock.info
 simple-java-maven-app/
 java-app/
+charts/
