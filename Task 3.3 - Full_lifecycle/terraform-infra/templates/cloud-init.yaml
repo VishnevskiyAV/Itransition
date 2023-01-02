@@ -1,0 +1,57 @@
+#cloud-config
+system_info:
+  distro: ubuntu
+
+repo_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+apt:
+  sources:
+    docker.list:
+      source: deb [arch=amd64] https://download.docker.com/linux/ubuntu $RELEASE stable
+      keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-compose-plugin
+  - docker-compose
+  - unzip
+
+# create the docker group
+groups:
+  - docker
+
+# Add default auto created user to docker group
+system_info:
+  default_user:
+    groups: [docker]
+
+runcmd:
+# Turn on ssh-rsa keys 
+  - [ sh, -c, 'echo PubkeyAcceptedKeyTypes +ssh-rsa >>/etc/ssh/sshd_config' ]
+  - [systemctl, restart, sshd]
+  - sleep 10
+# GitLab Setup
+  - export GITLAB_HOME=${GITLAB_HOME}
+  - docker compose -f /tmp/gitlab.yaml up -d
+# Nexus Setup
+  - docker compose -f /tmp/nexus.yaml up -d
+# Sonarqube Setup
+  - sysctl -w vm.max_map_count=524288
+  - sysctl -w fs.file-max=131072
+  - ulimit -n 131072
+  - ulimit -u 8192
+  - docker compose -f /tmp/sonar.yaml up -d
+
+final_message: "THE SYSTEM IS FINALLY UP, AFTER '$UPTIME' SECONDS"
+
+output:
+  all: '| tee -a /var/log/cloud-init-output.log'

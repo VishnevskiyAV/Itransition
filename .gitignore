@@ -6,6 +6,6 @@ ssh/
 *.tfstate.backup
 *.terraform.lock.hcl
 *.tfstate.lock.info
-simple-java-maven-app/
 java-app/
 charts/
+simple-java-maven-app/
