@@ -1,0 +1,48 @@
+#cloud-config
+system_info:
+  distro: ${distro}
+
+repo_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+packages:
+  - nginx
+  - net-tools
+  - postgresql-client-common
+  - redis-tools
+  - postgresql-client-14
+  - awscli
+
+write_files:
+  - path: /var/www/html/index.html
+    content: |
+      <html>
+      <body bgcolor="black">
+      <h2><font color="gold">Build by Power of Terraform</h2></br><p>
+      <font color="green">Server Private IP: <font color="aqua"> OLDIP <br><br>
+      <font color="magenta">
+      <b>Version 1.0</b>
+      </body>
+      </html>
+    permissions: "0655"
+    owner: root:root
+
+runcmd:
+  # Linux
+  ## Turn on ssh-rsa keys
+  - [sh, -c, "echo PubkeyAcceptedKeyTypes +ssh-rsa >>/etc/ssh/sshd_config"]
+  - [systemctl, restart, sshd]
+  ## Start nginx
+  - [systemctl, enable, nginx]
+  - [systemctl, start, nginx]
+  ## nginx new index.html
+  - rm -rf /var/www/html/index.nginx-debian.html
+  - IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
+  - sed -i -r "s/OLDIP/$IP/" /var/www/html/index.html
+  - apt-get clean all
+
+final_message: "THE SYSTEM IS FINALLY UP, AFTER '$UPTIME' SECONDS"
+
+output:
+  all: "| tee -a /var/log/cloud-init-output.log"
