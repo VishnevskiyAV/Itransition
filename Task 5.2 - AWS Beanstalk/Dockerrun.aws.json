@@ -1,0 +1,27 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "web",
+      "image": "417211443250.dkr.ecr.eu-central-1.amazonaws.com/app:1.0",
+      "essential": true,
+      "memory": 256
+    },
+    {
+      "name": "proxy",
+      "image": "417211443250.dkr.ecr.eu-central-1.amazonaws.com/nginx:2.0",
+      "essential": true,
+      "memory": 256,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "links": [
+        "web"
+      ]
+    }
+  ]
+}

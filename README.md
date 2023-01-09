@@ -7,3 +7,5 @@
 5. [Task_3.1-Jenkins](https://github.com/VishnevskiyAV/Itransition/tree/main/Task%203.1%20-%20Jenkins)
 6. [Task_3.2-ArgoCD](https://github.com/VishnevskiyAV/Itransition/tree/main/Task%203.2%20-%20ArgoCD)
 7. [Task_3.3-FullLifecycle](https://github.com/VishnevskiyAV/Itransition/tree/main/Task%203.3%20-%20Full_lifecycle)
+8. [Task_5.1-AWS_Fundamentals](https://github.com/VishnevskiyAV/Itransition/tree/main/Task%205.1%20-%20AWS%20Fundamentals)
+9. [Task_5.2-AWS_Beanstalk](https://github.com/VishnevskiyAV/Itransition/tree/main/Task%205.2%20-%20AWS%20Beanstalk)
