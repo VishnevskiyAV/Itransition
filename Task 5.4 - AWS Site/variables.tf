@@ -35,57 +35,63 @@ variable "project" {
 # These variables have defaults, but may be overridden.
 # ----------------------------------------------------------------------------------------------------------------------
 
-variable "sg_inbound_ports" {
+variable "srv_sg_inbound_ports" {
   type        = list(any)
   description = "Inbound rules for security group"
-  default     = ["80", "8080", "3306", "22"]
+  default     = ["80", "22"]
+}
+
+variable "alb_sg_inbound_ports" {
+  type        = list(any)
+  description = "Inbound rules for security group"
+  default     = ["80"]
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Mysql Parameters for wordpress DB
 # These variables have defaults, but may be overridden.
 # ----------------------------------------------------------------------------------------------------------------------
-# variable "db_root_password" {
-#   type        = string
-#   description = "DB root password"
-#   default     = "root"
-# }
+variable "db_root_password" {
+  type        = string
+  description = "DB root password"
+  default     = "root"
+}
 
-# variable "db_username" {
-#   type        = string
-#   description = "DB wordpress username"
-#   default     = "wordpress"
-# }
+variable "db_username" {
+  type        = string
+  description = "DB wordpress username"
+  default     = "wordpress"
+}
 
-# variable "db_user_password" {
-#   type        = string
-#   description = "DB wordpress password"
-#   default     = "wordpress"
-# }
+variable "db_user_password" {
+  type        = string
+  description = "DB wordpress password"
+  default     = "wordpress"
+}
 
-# variable "db_name" {
-#   type        = string
-#   description = "DB wordpress name"
-#   default     = "wordpress"
-# }
+variable "db_name" {
+  type        = string
+  description = "DB wordpress name"
+  default     = "wordpress"
+}
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Nginx parameters
 # These variables have defaults, but may be overridden.
 # ----------------------------------------------------------------------------------------------------------------------
 
-variable "listen_port_proxy" {
-  type        = string
-  description = "Listen port for reverse proxy"
-  default     = 80
-}
+# variable "listen_port_proxy" {
+#   type        = string
+#   description = "Listen port for reverse proxy"
+#   default     = 80
+# }
 
-variable "listen_port_back" {
-  type        = string
-  description = "Listen port for backend server"
-  default     = 8080
-}
+# variable "listen_port_back" {
+#   type        = string
+#   description = "Listen port for backend server"
+#   default     = 8080
+# }
 
-variable "name" {
-    default = "Admin"
-}
+# variable "name" {
+#     default = "Admin"
+# }
