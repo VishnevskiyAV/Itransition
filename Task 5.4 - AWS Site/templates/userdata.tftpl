@@ -1,0 +1,87 @@
+#!/bin/bash
+
+yum -y update
+yum -y install git
+
+#configs
+
+
+
+# Apache
+yum install httpd -y
+systemctl start httpd.service
+systemctl enable httpd.service
+
+
+# MySQL
+wget http://repo.mysql.com/mysql57-community-release-el7.rpm
+rpm -ivh mysql57-community-release-el7.rpm
+rpm --import http://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+yum -y update
+yum install mysql-server -y
+
+systemctl start mysqld
+
+sh -c cat /tmp/mysql/wordpress-db.sql | mysql -u root
+sh -c cat /tmp/mysql/db-secure_installation.sql | mysql -u root
+
+
+# PHP
+yum -y update
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum -y install https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+yum makecache
+yum -y install yum-utils
+yum-config-manager --disable 'remi-php*'
+amazon-linux-extras enable php8.0
+yum clean metadata
+yum install -y php-{pear,cgi,pdo,common,curl,mbstring,gd,mysqlnd,gettext,bcmath,json,xml,fpm,intl,zip}
+
+
+# gatsby
+yum install -y gcc-c++ make
+curl -sL https://rpm.nodesource.com/setup_16.x | bash -
+yum install -y nodejs
+
+npm -g i gatsby-cli@4.25.0
+
+
+# Wordpress
+wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -P /tmp 
+mv /tmp/wp-cli.phar /usr/local/bin/wp
+chmod +x /usr/local/bin/wp
+## wordpress install
+wp core download --path=/var/www/wordpress --allow-root
+# sh -c /root/cloud-init/wp-config.sh
+
+# chown -R www-data:www-data /var/www/html
+# chmod -R 755 /var/www/html
+
+# curl -O --output-dir /tmp https://wordpress.org/latest.tar.gz
+# tar xavf /tmp/latest.tar.gz -C ${app_path}
+# rm -f /tmp/latest.tar.gz -v
+
+systemctl restart httpd.service && systemctl restart php-fpm
+
+
+# wordpress configuring 
+mkdir /etc/httpd/sites-available /etc/httpd/sites-enabled
+echo "IncludeOptional sites-enabled/*.conf" >> /etc/httpd/conf/httpd.conf
+mv /tmp/httpd.conf /etc/httpd/sites-available/httpd.conf
+cp /tmp/wp-config.sh ${app_path}/wordpress/wp-config.php
+
+chown -R apache:apache ${app_path}/wordpress
+find ${app_path}/wordpress/ -type d -exec chmod 750 {} \;
+find ${app_path}/wordpress/ -type f -exec chmod 640 {} \;
+
+ln -s /etc/httpd/sites-available/httpd.conf /etc/httpd/sites-enabled/httpd.conf
+
+# setsebool -P httpd_unified 1
+systemctl restart httpd.service && systemctl restart php-fpm
+
+
+# Gatsby configuration
+gatsby new my-hello-world-starter https://github.com/gatsbyjs/gatsby-starter-hello-world
+cd my-hello-world-starter/
+gatsby build
+gatsby serve --host 0.0.0.0 &
