@@ -23,8 +23,10 @@ yum install mysql-server -y
 
 systemctl start mysqld
 
-sh -c cat /tmp/mysql/wordpress-db.sql | mysql -u root
-sh -c cat /tmp/mysql/db-installation.sql | mysql -u root
+password=$(grep -oP 'temporary password(.*): \K(\S+)' /var/log/mysqld.log)
+
+sh -c cat /tmp/mysql/wordpress-db.sql | mysql --user=root --password=${password}
+sh -c cat /tmp/mysql/db-installation.sql | mysql --user=root --password=${password}
 
 # PHP
 yum -y update
@@ -49,11 +51,11 @@ wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -
 mv /tmp/wp-cli.phar /usr/local/bin/wp
 chmod +x /usr/local/bin/wp
 ## wordpress install
-wp core download --path=${app_path}/wordpress --allow-root
+wp core download --path=/var/www/wordpress --allow-root
 sh -c /tmp/wp-config.sh
 
-chown -R apache:apache ${app_path}/wordpress
-chmod -R 755 ${app_path}/wordpress
+chown -R apache:apache /var/www/wordpress
+chmod -R 755 /var/www/wordpress
 
 systemctl restart httpd.service && systemctl restart php-fpm
 
@@ -61,7 +63,6 @@ systemctl restart httpd.service && systemctl restart php-fpm
 mkdir /etc/httpd/sites-available /etc/httpd/sites-enabled
 echo "IncludeOptional sites-enabled/*.conf" >>/etc/httpd/conf/httpd.conf
 mv /tmp/httpd.conf /etc/httpd/sites-available/httpd.conf
-#cp /tmp/wp-config.sh ${app_path}/wordpress/wp-config.php
 
 ln -s /etc/httpd/sites-available/httpd.conf /etc/httpd/sites-enabled/httpd.conf
 

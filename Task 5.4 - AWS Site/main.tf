@@ -120,7 +120,7 @@ resource "aws_lb_target_group" "tg" {
     interval            = 10
     unhealthy_threshold = 3
     timeout             = 5
-    path                = "/"
+    path                = "/app2"
     port                = 80
   }
 }
