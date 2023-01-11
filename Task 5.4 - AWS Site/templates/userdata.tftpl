@@ -23,10 +23,12 @@ yum install mysql-server -y
 
 systemctl start mysqld
 
-password=$(grep -oP 'temporary password(.*): \K(\S+)' /var/log/mysqld.log)
-
-sh -c cat /tmp/mysql/wordpress-db.sql | mysql --user=root --password=${password}
-sh -c cat /tmp/mysql/db-installation.sql | mysql --user=root --password=${password}
+pass=$(grep -oP 'temporary password(.*): \K(\S+)' /var/log/mysqld.log)
+new_pass="123qweASD!"
+mysqladmin --user=root --password=${pass} password ${new_pass}
+mysql --user=root --password=${new_pass} -e "UNINSTALL PLUGIN validate_password;"
+mysqladmin --user=root --password=${new_pass} password ""
+mysql </tmp/mysql/wordpress-db.sql
 
 # PHP
 yum -y update
