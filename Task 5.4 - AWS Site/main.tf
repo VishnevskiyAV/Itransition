@@ -31,10 +31,7 @@ resource "aws_instance" "web" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.web_access.id]
   #user_data_base64       = data.template_cloudinit_config.nginx.rendered
-  user_data = templatefile("./templates/userdata.tftpl", {
-    #new_password = data.aws_ssm_parameter.my_rds_password.value,
-    app_path = "/var/www"
-  })
+  user_data = file("./templates/userdata.tftpl")
 
   tags = {
     Name    = "${var.env}"
