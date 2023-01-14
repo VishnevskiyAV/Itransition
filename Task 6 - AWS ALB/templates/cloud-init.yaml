@@ -1,0 +1,90 @@
+#cloud-config
+system_info:
+  distro: ubuntu
+
+repo_update: true
+package_upgrade: true
+package_reboot_if_required: true
+
+packages:
+- nginx
+- mysql-server
+- php-fpm
+- php8.1-gd
+- php-mysql
+- net-tools
+
+write_files:
+  # nginx /sites-available config
+  - path: /etc/nginx/sites-available/nginx.conf
+    owner: root:root
+    content: ${proxy_content}
+    permissions: '0644'
+    encoding: gz+b64
+  - path: /root/cloud-init/mysql/db-secure_installation.sql
+    content: |
+          UPDATE mysql.user SET authentication_string=null WHERE User='root';
+          UPDATE mysql.user SET plugin='mysql_native_password'  WHERE User='root';
+          ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${db_root_password}';
+          DELETE FROM mysql.user WHERE User='';
+          DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+          DROP DATABASE IF EXISTS test;
+          DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+          FLUSH PRIVILEGES;
+    permissions: '0600'
+    owner: root:root
+  # wordpress_db
+  - path: /root/cloud-init/mysql/wordpress-db.sql
+    content: |
+          CREATE DATABASE ${db_name};
+          CREATE USER ${db_username}@localhost IDENTIFIED BY '${db_user_password}';
+          GRANT ALL PRIVILEGES ON ${db_name}.* TO ${db_username}@localhost;
+          FLUSH PRIVILEGES;
+    permissions: '0600'
+    owner: root:root
+  # wordpress config
+  - path: /root/cloud-init/wp-config.php
+    owner: root:root
+    content: ${php_content}
+    permissions: '0755'
+    encoding: gz+b64
+
+runcmd:
+  # Linux
+  ## Crontab schedule rule for cleaning /tmp
+  - [ sh, -c, 'echo "12 2 * * * root find /tmp -depth -mtime +14 -size +5 -exec rm -rf {} \;" >> /etc/crontab' ]
+  ## Turn on ssh-rsa keys 
+  - [ sh, -c, 'echo PubkeyAcceptedKeyTypes +ssh-rsa >>/etc/ssh/sshd_config' ]
+  ## Create directiry for cash
+  - mkdir -p /var/www/cache
+  ## Start mysql nginx
+  - [systemctl, enable, mysql]
+  - [systemctl, start, mysql]
+  - [systemctl, enable, nginx]
+  - [systemctl, start, nginx]
+  - [systemctl, restart, sshd]
+  ## nginx enable new config
+  - rm -rf /etc/nginx/sites-enabled/default
+  - ln -s /etc/nginx/sites-available/nginx.conf /etc/nginx/sites-enabled/nginx.conf
+  # WordPress
+  ## db-init
+  - [ sh, -c, "cat /root/cloud-init/mysql/wordpress-db.sql | mysql -u root" ]
+  - [ sh, -c, "cat /root/cloud-init/mysql/db-secure_installation.sql | mysql -u root" ]
+  ## wp-cli
+  - [ wget, "https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar", -P, /tmp ]
+  - mv /tmp/wp-cli.phar /usr/local/bin/wp
+  - chmod +x /usr/local/bin/wp
+  ## wordpress install
+  - wp core download --path=/var/www/html --allow-root
+  - mv /root/cloud-init/wp-config.php /var/www/html
+  #- [ sh, -c, /root/cloud-init/wp-config.sh ]
+  #- sed -i -e 's/\r$//' /root/cloud-init/wp-config.sh
+  - chown -R www-data:www-data /var/www/html
+  - chmod -R 755 /var/www/html
+  - [systemctl, restart, nginx]
+  - apt-get clean all
+
+final_message: "THE SYSTEM IS FINALLY UP, AFTER '$UPTIME' SECONDS"
+
+output:
+  all: '| tee -a /var/log/cloud-init-output.log'

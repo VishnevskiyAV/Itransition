@@ -11,3 +11,4 @@
 9. [Task_5.2-AWS_Beanstalk](https://github.com/VishnevskiyAV/Itransition/tree/main/Task%205.2%20-%20AWS%20Beanstalk)
 9. [Task_5.3-Jenkins](https://github.com/VishnevskiyAV/Itransition/tree/main/Task%205.2%20-%20Jenkins)
 10. [Task_5.4-AWS_Site](https://github.com/VishnevskiyAV/Itransition/tree/main/Task%205.4%20-%20AWS%20Site)
+11. [Task_6-AWS_ALB](https://github.com/VishnevskiyAV/Itransition/tree/main/Task%206%20-%20AWS%20ALB)
